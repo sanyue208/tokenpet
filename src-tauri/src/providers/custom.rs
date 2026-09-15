@@ -59,7 +59,7 @@ pub async fn fetch(
 }
 
 // 极简 JSONPath：支持 $.a.b.c 与 $.a[0].b
-pub fn jsonpath(root: &Value, path: &str) -> Option<&Value> {
+pub fn jsonpath<'a>(root: &'a Value, path: &'a str) -> Option<&'a Value> {
     if !path.starts_with('$') {
         return None;
     }
