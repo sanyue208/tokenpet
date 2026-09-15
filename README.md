@@ -119,7 +119,8 @@ npm run tauri build
 **方式二：GitHub Actions 云端构建（无需本机装 Rust）**
 仓库已包含 `.github/workflows/build-windows.yml`（在 `windows-latest`  runner 上用 MSVC 工具链编译，产出真正的 Windows exe）。在 GitHub 上：
 1. `git tag v0.1.0 && git push --tags`，或到 Actions 页面手动 `Run workflow`；
-2. 跑完后到 `Artifacts` 下载 `TokenPet-windows`，里面就是 exe / 安装包。
+2. 跑完后到 `Artifacts` 下载 `TokenPet-windows`，里面就是 exe / 安装包；
+3. 打 tag 触发时还会**自动创建 Release**，把 exe / msi 挂成下载资源（Releases 页面免登录即可下载）。
 
 > 注：当前开发沙箱环境**未安装 Rust 工具链**，无法在本机直接 `tauri build` 出 exe；本地 Rust 路径仅适用于你自己的 Windows 电脑。云端构建（方式二）不依赖本地环境，是最稳的出包方式。
 
