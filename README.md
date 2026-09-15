@@ -128,6 +128,37 @@ npm run tauri build
 
 ---
 
+## 代码签名（消除 SmartScreen / 智能应用控制拦截）
+
+未签名的 exe 会被 Win11 的 SmartScreen 与「智能应用控制」拦截；**签名后即可放行**（自签名无效，必须是受信任 CA 的证书）。
+
+| 方案 | 成本 | 说明 |
+| --- | --- | --- |
+| **Azure Trusted Signing** | 约 $10/月 | 推荐；支持个人身份验证；CI 集成最省事 |
+| **SignPath.io** | 开源项目免费 | 公开仓库可申请（SignPath Foundation） |
+| OV / EV 证书 | $100–400/年 | EV 可秒过 SmartScreen；但新证书硬件绑定，CI 需其云端签名服务 |
+
+**CI 已内置签名步骤**：检测到下列 Secrets 时自动签名，否则自动跳过（不影响正常构建）。
+仓库 Settings → Secrets and variables → Actions 添加：
+
+- `AZURE_TENANT_ID`
+- `AZURE_CLIENT_ID`
+- `AZURE_CLIENT_SECRET`
+- `AZURE_CODE_SIGNING_ENDPOINT`（形如 `https://eus.codesigning.azure.net/`）
+- `AZURE_CODE_SIGNING_ACCOUNT`（Trusted Signing 账户名）
+- `AZURE_CERT_PROFILE`（证书配置文件 Profile 名）
+
+**申请步骤（Azure Trusted Signing）**
+1. Azure 订阅 → 创建 *Trusted Signing* 账户
+2. 完成 Identity Validation（个人或组织）
+3. 创建 Certificate Profile
+4. 建一个 App Registration（服务主体），授予 *Trusted Signing Certificate Profile Signer* 角色
+5. 把上面 6 个值填入 GitHub Secrets，之后每次打 tag 构建出来的 exe 都是已签名的
+
+> 签名后在任意机器上双击即用，不再有 SmartScreen / SAC 提示。
+
+---
+
 ## 目录结构
 
 ```
