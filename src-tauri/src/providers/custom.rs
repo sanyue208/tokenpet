@@ -27,7 +27,11 @@ pub async fn fetch(
 
     let resolve_num = |field: &str| -> Option<f64> {
         let path = mapping.get(field).and_then(|v| v.as_str())?;
-        jsonpath(&resp, path).and_then(|v| v.as_f64())
+        match jsonpath(&resp, path)? {
+            Value::Number(n) => n.as_f64(),
+            Value::String(s) => s.trim().parse::<f64>().ok(),
+            _ => None,
+        }
     };
 
     let currency = mapping

@@ -1,17 +1,31 @@
 use crate::config::ProviderConfig;
 use crate::providers::model::ProviderSnapshot;
 use reqwest::Client;
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer};
+use serde_json::Value;
+
+// 厂商返回的余额常常是字符串（如 "110.00"），这里同时兼容字符串与数字
+fn de_f64<'de, D>(d: D) -> Result<f64, D::Error>
+where
+    D: Deserializer<'de>,
+{
+    let v = Value::deserialize(d)?;
+    Ok(match v {
+        Value::Number(n) => n.as_f64().unwrap_or(0.0),
+        Value::String(s) => s.trim().parse::<f64>().unwrap_or(0.0),
+        _ => 0.0,
+    })
+}
 
 #[derive(Debug, Deserialize)]
 struct BalanceInfo {
     #[serde(default)]
     currency: String,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "de_f64")]
     total_balance: f64,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "de_f64")]
     granted_balance: f64,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "de_f64")]
     topped_up_balance: f64,
 }
 
