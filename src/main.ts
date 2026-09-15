@@ -127,6 +127,8 @@ async function main(): Promise<void> {
   const openCfg = async () => {
     if (!config) config = await getConfig();
     if (!config.customProviders) config.customProviders = [];
+    const wasCompact = app.classList.contains("compact");
+    if (wasCompact) setExpanded(true, false); // 简洁模式下临时展开，设置关掉后还原
     openSettings(
       config,
       async (cfg) => {
@@ -137,7 +139,10 @@ async function main(): Promise<void> {
         rerenderPet();
         restartRealtime();
       },
-      rerenderPet
+      rerenderPet,
+      () => {
+        if (wasCompact) setExpanded(false, false);
+      }
     );
   };
 

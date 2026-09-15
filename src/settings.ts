@@ -14,7 +14,8 @@ const esc = (s: string) => s.replace(/"/g, "&quot;");
 export function openSettings(
   cfg: Config,
   onSave: (c: Config) => void,
-  rerenderPet: () => void
+  rerenderPet: () => void,
+  onClose?: () => void
 ): void {
   const overlay = document.createElement("div");
   overlay.className = "overlay";
@@ -186,6 +187,7 @@ export function openSettings(
     cfg.bgAlpha = origAlpha;
     applyBgAlpha(origAlpha);
     overlay.remove();
+    onClose?.();
   };
   overlay.addEventListener("click", (e) => {
     if (e.target === overlay) closeWithoutSave();
@@ -241,5 +243,6 @@ export function openSettings(
 
     onSave(cfg);
     overlay.remove();
+    onClose?.();
   });
 }
