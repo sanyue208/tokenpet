@@ -50,7 +50,7 @@ export function openSettings(
         <div class="prov-body">
           <label class="row-inline"><input type="checkbox" id="proxyOn" ${cfg.proxy?.enabled ? "checked" : ""}/> 启用实时 token 统计</label>
           <label class="row-inline">代理端口 <input class="inp small" id="proxyPort" type="number" min="1024" max="65535" value="${cfg.proxy?.port ?? 8787}"/></label>
-          <div class="hint">先在终端运行 <b>node tools/token-proxy.mjs</b>，再把 LLM 客户端的 base_url 指到 <b>http://127.0.0.1:${cfg.proxy?.port ?? 8787}</b>，宠物头顶即会实时显示每次 prompt / completion 消耗（余额仍走官方账单接口）。</div>
+          <div class="hint">开启后 <b>app 内置代理会自动运行</b>（隐藏进程，无需另开窗口）。把你的 LLM 客户端 base_url 指到 <b>http://127.0.0.1:${cfg.proxy?.port ?? 8787}</b>，宠物头顶即实时显示每次 prompt / completion 消耗（余额仍走官方账单接口）。</div>
         </div>
       </div>
 

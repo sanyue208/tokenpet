@@ -67,7 +67,7 @@ export function renderRealtime(el: HTMLElement, proxy: ProxyConfig | undefined, 
   if (!s) {
     el.innerHTML = `<div class="rt-card off">
       <div class="rt-head"><span class="rt-dot"></span>实时 token · 未连接</div>
-      <div class="rt-sub">先在终端运行 <code>node tools/token-proxy.mjs</code>，再把 LLM 客户端的 base_url 指到 <code>http://127.0.0.1:${proxy.port}</code></div>
+      <div class="rt-sub">内置代理未就绪。请确认开关已开启（app 会自动拉起隐藏代理）；若本机未装 Node，可手动运行 <code>node tools/token-proxy.mjs</code>。目标地址 <code>http://127.0.0.1:${proxy.port}</code></div>
     </div>`;
     return;
   }

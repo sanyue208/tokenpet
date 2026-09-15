@@ -3,6 +3,7 @@
 mod config;
 mod poll;
 mod providers;
+mod proxy;
 
 use std::sync::Mutex;
 use tauri::Manager;
@@ -41,7 +42,7 @@ async fn manual_refresh(
 }
 
 fn main() {
-    tauri::Builder::default()
+    let app = tauri::Builder::default()
         .setup(|app| {
             let handle = app.handle().clone();
             let cfg = config::load(&handle).unwrap_or_default();
@@ -58,6 +59,9 @@ fn main() {
                 let _ = win.set_size(tauri::LogicalSize::new(w, h));
             }
 
+            // 内置代理状态
+            app.manage(proxy::ProxyState::default());
+
             app.manage(AppState {
                 app_handle: handle.clone(),
                 config: Mutex::new(cfg),
@@ -73,8 +77,17 @@ fn main() {
             get_config,
             save_config,
             set_poll_interval,
-            manual_refresh
+            manual_refresh,
+            proxy::proxy_start,
+            proxy::proxy_stop,
+            proxy::proxy_status
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application");
+
+    app.run(|app_handle, event| {
+        if let tauri::RunEvent::Exit = event {
+            proxy::stop_child(app_handle);
+        }
+    });
 }

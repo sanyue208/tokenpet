@@ -41,6 +41,25 @@ export async function manualRefresh(): Promise<Snapshot> {
   return (await invoke("manual_refresh")) as Snapshot;
 }
 
+// 内置实时 token 代理（app 内部启动，无需另开窗口）
+export async function proxyStart(port: number, upstream?: string): Promise<void> {
+  if (!isTauri) return;
+  const { invoke } = await import("@tauri-apps/api/core");
+  await invoke("proxy_start", { port, upstream: upstream ?? null });
+}
+
+export async function proxyStop(): Promise<void> {
+  if (!isTauri) return;
+  const { invoke } = await import("@tauri-apps/api/core");
+  await invoke("proxy_stop");
+}
+
+export async function proxyRunning(): Promise<boolean> {
+  if (!isTauri) return false;
+  const { invoke } = await import("@tauri-apps/api/core");
+  return (await invoke("proxy_status")) as boolean;
+}
+
 export async function listenSnapshot(cb: (s: Snapshot) => void): Promise<void> {
   if (!isTauri) {
     mockLoop(cb);

@@ -1,5 +1,5 @@
 // 入口：组装 UI、连接后端 / mock、处理交互。TokenPet · 三月个人专用
-import { getConfig, saveConfig, listenSnapshot, manualRefresh, windowControls, isTauri } from "./tauri-api";
+import { getConfig, saveConfig, listenSnapshot, manualRefresh, windowControls, isTauri, proxyStart, proxyStop } from "./tauri-api";
 import type { WindowControls } from "./tauri-api";
 import type { Config, Snapshot, ProviderSnapshot, PetStyle } from "./state";
 import { fmtMoney, applyBgAlpha } from "./state";
@@ -74,15 +74,20 @@ function updateRealtimeUI(): void {
 }
 
 // 按配置启停实时轮询（1s 拉一次本地代理 /__stats）
+// 启用时由 app 直接拉起内置代理（隐藏进程），无需另开窗口
 function restartRealtime(): void {
   stopRealtime?.();
   stopRealtime = null;
   realtime = null;
-  if (config?.proxy?.enabled) {
-    stopRealtime = startRealtime(config.proxy, (s) => {
+  const proxy = config?.proxy;
+  if (proxy?.enabled) {
+    void proxyStart(proxy.port).catch(() => {});
+    stopRealtime = startRealtime(proxy, (s) => {
       realtime = s;
       updateRealtimeUI();
     });
+  } else {
+    void proxyStop().catch(() => {});
   }
   updateRealtimeUI();
 }
